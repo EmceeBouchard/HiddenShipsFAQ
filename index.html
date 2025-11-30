@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2a2a2a">
+    <title>Hidden Ships FAQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --copper: #b87333;
+            --copper-dark: #8b5a2b;
+            --cream: #f5f0e6;
+            --charcoal: #2a2a2a;
+            --oak: #4a3728;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background: var(--charcoal);
+            color: var(--cream);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            flex-shrink: 0;
+            text-align: center;
+            padding: calc(20px + var(--safe-top)) 20px 12px;
+            background: var(--charcoal);
+            border-bottom: 1px solid rgba(184, 115, 51, 0.3);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            filter: invert(1) sepia(1) saturate(2) hue-rotate(350deg) brightness(0.85);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--copper);
+            letter-spacing: 2px;
+        }
+
+        .admin-link {
+            font-size: 0.75rem;
+            color: rgba(245, 240, 230, 0.4);
+            margin-top: 6px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .admin-mode .admin-link {
+            color: var(--copper);
+        }
+
+        .search-box {
+            flex-shrink: 0;
+            padding: 16px;
+            background: var(--charcoal);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-family: 'Source Sans Pro', sans-serif;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--copper-dark);
+            border-radius: 8px;
+            color: var(--cream);
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(245, 240, 230, 0.4);
+        }
+
+        .search-box input:focus {
+            border-color: var(--copper);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px calc(20px + var(--safe-bottom));
+        }
+
+        .result-count {
+            font-size: 0.8rem;
+            color: rgba(245, 240, 230, 0.5);
+            padding: 8px 0 12px;
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .faq-item {
+            background: rgba(74, 55, 40, 0.5);
+            border-left: 3px solid var(--copper);
+            padding: 18px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+            position: relative;
+        }
+
+        .faq-item:active {
+            background: rgba(74, 55, 40, 0.8);
+        }
+
+        .faq-item.expanded {
+            background: rgba(74, 55, 40, 0.7);
+        }
+
+        .faq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .faq-header-left {
+            flex: 1;
+        }
+
+        .faq-category {
+            display: inline-block;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--copper);
+            margin-bottom: 6px;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--cream);
+            line-height: 1.4;
+            padding-right: 20px;
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--copper);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+            width: 24px;
+            text-align: center;
+        }
+
+        .faq-item.expanded .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            display: none;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(184, 115, 51, 0.3);
+            color: rgba(245, 240, 230, 0.9);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .faq-item.expanded .faq-answer {
+            display: block;
+        }
+
+        .edit-btn {
+            display: none;
+            padding: 8px 14px;
+            background: var(--copper);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .admin-mode .edit-btn {
+            display: block;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(245, 240, 230, 0.5);
+        }
+
+        .no-results span {
+            display: block;
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            background: var(--charcoal);
+            border: 1px solid var(--copper-dark);
+            border-radius: 12px;
+            padding: 24px;
+            margin: auto;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .modal h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--copper);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .modal label {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(245, 240, 230, 0.6);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal input,
+        .modal textarea {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-family: 'Source Sans Pro', sans-serif;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--copper-dark);
+            border-radius: 6px;
+            color: var(--cream);
+            margin-bottom: 16px;
+            outline: none;
+        }
+
+        .modal textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal input:focus,
+        .modal textarea:focus {
+            border-color: var(--copper);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1rem;
+            font-family: 'Source Sans Pro', sans-serif;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: var(--copper);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
+            color: var(--cream);
+        }
+
+        .btn-delete {
+            background: #8b3a3a;
+            color: white;
+            margin-top: 12px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            display: none;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: rgba(184, 115, 51, 0.3);
+            border: 2px dashed var(--copper-dark);
+            border-radius: 8px;
+            color: var(--copper);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .admin-mode .btn-add {
+            display: block;
+        }
+
+        .admin-banner {
+            display: none;
+            background: var(--copper);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+
+        .admin-mode .admin-banner {
+            display: block;
+        }
+
+        .sync-status {
+            font-size: 0.7rem;
+            color: rgba(245, 240, 230, 0.4);
+            text-align: center;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-banner">✏️ Edit Mode — Tap "Andy & Amy" to exit</div>
+    
+    <header>
+        <div class="header-title">
+            <img src="data:image/webp;base64,UklGRhAMAABXRUJQVlA4WAoAAAAwAAAAhAMAhAMASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBImgEAAAFXQBAIGtvgEEY4IiKw+Qs41ranUu7gsApdgG5gYLy65S1xSUVJ6ZAzS6Byy0Lz5/zJuLwR/Z+ADP/jf/yP//E//sf/+B//43/8j//xP/7H//gf/+N//I//8T/+x//4H//j/3gfrMZFSW59b0RPVuOijtxqLEQv1ndecm01Fl3bl9O4JDl0vm3Rj9O4pOPQaTSiP+e7ILl1Gg3+w38TvR5s6P8UtG3oRR25Df2Xglcbuujawv+lYCVL8lsK2lmvjP/wH/7Df/gP/+G/MS1fLmb8h/+mDSpXYt4cFKQV/+E//NdXOD6PuTYo+HIxG/yH/6ZJeLDa/wYR+t/wH/7Df/gP/+E//EcxWhXtm4MI/Qb/4b8pgzog/sN/+G+I68fFbPAf/ptiyJxrrw0iVrIk4z/8h//wH/7Df/gP/+G
